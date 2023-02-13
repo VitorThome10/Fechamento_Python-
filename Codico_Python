@@ -1,0 +1,52 @@
+import pandas as pd    
+import datetime 
+import yfinance as yf from matplotlib import pyplot as plt
+import mplcyberpunk
+
+codicos_de_negociacao = ["^BVSP", "BRL=X"]  
+hoje = datetime.datetime.now() 
+last_year = hoje - datetime.timedelta(days = 365) 
+print(codicos_de_negociacao)  
+dados_mercado = yf.download(codicos_de_negociacao,last_year,  hoje) 
+display(dados_mercado)
+
+
+
+dados_fechamento = dados_mercado ['Adj Close'] 
+dados_fechamento.columns =['dolar', 'ibovespa'] 
+dados_fechamento = dados_fechamento.dropna()  
+dados_fechamento.head(50)
+
+dados_anuais= dados_fechamento.resample("Y").last() 
+dados_mensais= dados_fechamento.resample("M").last()  
+dados_mensais
+
+
+retornos_anuais = dados_anuais.pct_change().dropna() 
+retornos_mensais = dados_mensais.pct_change().dropna() 
+retornos_diarios = dados_fechamento.pct_change().dropna()  
+retornos_diarios
+
+retorno_diario_dolar = retornos_diarios.iloc[-1,0]
+retorno_diario_ibov = retornos_diarios.iloc[-1,1] 
+retorno_mensal_dolar = retornos_mensais.iloc[-1,0]
+retorno_mensal_ibov = retornos_mensais.iloc[-1,1] 
+retorno_anual_dolar = retornos_anuais.iloc[-1,0] 
+retorno_anual_ibov = retornos_anuais.iloc[-1,1]   
+display(retorno_anual_dolar)
+
+retorno_diario_dolar = round((retorno_diario_dolar*100), 2)
+retorno_diario_ibov = round((retorno_diario_ibov*100),2) 
+retorno_mensal_dolar = round((retorno_mensal_dolar*100),2) 
+retorno_mensal_ibov = round((retorno_mensal_ibov*100),2)  
+retorno_anual_dolar = round((retorno_anual_dolar*100),2) 
+retorno_anual_ibov = round((retorno_anual_ibov*100),2)
+
+plt.style.use("cyberpunk")  
+dados_fechamento.plot( y = "ibovespa", use_index = True) 
+plt.title("ibovespa")   
+plt.savefig('ibovesp.png',dpi= 300)  
+plt.show()
+
+outlook = win32.Dispatch("outlook.application")  
+email = outlook.CreateItem(0)  #Enviar Email 
